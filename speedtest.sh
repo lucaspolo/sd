@@ -5,8 +5,7 @@ LOOP_DELAY="${LOOP_DELAY:-60}"
 DB_SAVE="${DB_SAVE:-false}"
 DB_HOST="${DB_HOST:-http://localhost:8086}"
 DB_NAME="${DB_NAME:-speedtest}"
-DB_USERNAME="${DB_USERNAME:-admin}"
-DB_PASSWORD="${DB_PASSWORD:-password}"
+DB_TOKEN="${DB_TOKEN:-token}"
 
 run_speedtest()
 {
@@ -27,11 +26,14 @@ run_speedtest()
     if $DB_SAVE; 
     then
         echo "Saving values to database..."
-        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s&u=$DB_USERNAME&p=$DB_PASSWORD" \
+        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s \
+            --header "Authorization: Token $DB_TOKEN" \
             --data-binary "download,host=$HOSTNAME value=$DOWNLOAD $DATE"
-        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s&u=$DB_USERNAME&p=$DB_PASSWORD" \
+        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s \
+            --header "Authorization: Token $DB_TOKEN" \
             --data-binary "upload,host=$HOSTNAME value=$UPLOAD $DATE"
-        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s&u=$DB_USERNAME&p=$DB_PASSWORD" \
+        curl -s -S -XPOST "$DB_HOST/write?db=$DB_NAME&precision=s \
+            --header "Authorization: Token $DB_TOKEN" \
             --data-binary "ping,host=$HOSTNAME value=$PING $DATE"
         echo "Values saved."
     fi
